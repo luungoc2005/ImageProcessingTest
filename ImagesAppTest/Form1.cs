@@ -61,6 +61,8 @@ namespace ImagesAppTest
             var bmp = new Bitmap(pictureBox1.Image);
             ImageProcessor.AdaptiveThreshold(bmp);
             pictureBox1.Image = bmp;
+
+            MessageBox.Show(ImageProcessor.FindRotation(bmp).ToString());
         }
     }
 }
