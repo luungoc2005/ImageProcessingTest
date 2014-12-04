@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Drawing;
 
 namespace ImagesAppTest
 {
@@ -48,6 +49,18 @@ namespace ImagesAppTest
             catch
             {
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var bmp = new Bitmap(pictureBox1.Image);
+            ImageProcessor.AdaptiveThreshold(bmp);
+            pictureBox1.Image = bmp;
         }
     }
 }
