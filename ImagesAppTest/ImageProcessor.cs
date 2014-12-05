@@ -289,7 +289,7 @@ namespace ImagesAppTest
 
             //Hough transform
             int distance = (int)((image.Width+ image.Height)*Math.Sqrt(2));
-            distance = (int)Math.Sqrt(image.Width * image.Width + image.Height * image.Height);
+            //distance = (int)Math.Sqrt(image.Width * image.Width + image.Height * image.Height);
 
             int[,] accumulator = new int[180, distance + 1];
             for (int x = 0; x < image.Width; x++)
@@ -298,7 +298,7 @@ namespace ImagesAppTest
                 {
                     if (bwImage[x, y] == 0)
                     {
-                        for (int i = 0; i < 180; i++)
+                        for (int i = 60; i < 120; i++)
                         {
                             //double rads = i*Math.PI/180.0;
                             //double d2 = Math.Max(0, y * Math.Sin(rads) + x * Math.Cos(rads));
@@ -325,9 +325,10 @@ namespace ImagesAppTest
                 }
             }
 
+            //Displaying where the strongest line is
             for (int x = 0; x < image.Width; x++)
             {
-                int y2 = (int)(((distance/2 - x) * Math.Cos((xMax) * Math.PI / 180.0)) / Math.Sin((xMax) * Math.PI / 180.0));
+                int y2 = (int)(((double)(x) * Math.Cos((180-xMax) * Math.PI / 180.0) + yMax) / Math.Sin((180-xMax) * Math.PI / 180.0));
                 image.SetPixel(x, Math.Max(0, Math.Min(y2, image.Height - 1)), Color.Red);
             }
 
