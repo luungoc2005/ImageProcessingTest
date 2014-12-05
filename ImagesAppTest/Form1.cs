@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using System.Drawing;
+using System.Drawing.Imaging;
+using System.Diagnostics;
 
 namespace ImagesAppTest
 {
@@ -60,9 +61,12 @@ namespace ImagesAppTest
         {
             var bmp = new Bitmap(pictureBox1.Image);
             ImageProcessor.AdaptiveThreshold(bmp);
-            pictureBox1.Image = bmp;
+            int angle = ImageProcessor.FindRotation(bmp);
+            //MessageBox.Show(angle.ToString());
 
-            MessageBox.Show(ImageProcessor.FindRotation(bmp).ToString());
+            //pictureBox1.Image = bmp;
+            pictureBox1.Image = ImageProcessor.RotateImage(bmp, 90-angle);
+
         }
     }
 }

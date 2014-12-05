@@ -87,68 +87,6 @@ namespace ImagesAppTest
             image.UnlockBits(bm);
         }
 
-        //This only works for threshold-filtered bitmaps
-        public static int FindRotation(Bitmap image)
-        {
-            BitmapData bm = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
-                            System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-
-            byte[,] bwImage = new byte[image.Width, image.Height];
-            int stride = bm.Stride;
-            System.IntPtr scan0 = bm.Scan0;
-            
-            //copy to a 2d array
-            unsafe
-            {
-                byte* p = (byte*)(void*)scan0;
-                int offset = stride - image.Width * 3;
-                
-                for (int y = 0; y < image.Height; y++)
-                {                    
-                    for (int x = 0; x < image.Width; x++)
-                    {
-                        bwImage[x, y] = p[0];
-                        p += 3; //Advance by 3b
-                    }
-                    p += offset;
-                }
-            }
-            image.UnlockBits(bm);
-
-            //Hough transform
-            int[] angles=new int[89];
-            int angleOffset=(180-angles.Length)/2;
-
-            for (int y = 0; y < image.Height; y++)
-            {
-                for (int x = 0; x < image.Width; x ++)
-                {
-                    if (bwImage[x, y] == 255)
-                    {
-                        for (int angle = 0; angle < angles.Length-1; angle++)
-                        {
-                            double rads = (double)(angle+angleOffset) * Math.PI / 180.0;
-                            //try each angle
-                            for (int x2 = x; x2 < image.Width; x2++)
-                            {
-                                int y2 = Math.Max(0,(Math.Sin(rads)==0)? y:
-                                    Math.Min((int)((x * Math.Cos(rads) + (x2 - x)) / Math.Sin(rads)),image.Height-1));
-                                if (bwImage[x2, y2] == 255) angles[angle] += 1; //+1 vote
-                            }
-                        }
-                    }
-                }
-            }
-
-            int maxVotes = 0;
-            for (int i = 0; i < 89; i++)
-            {
-                if (angles[i] > angles[maxVotes]) maxVotes = i;
-            }
-
-            return maxVotes;
-        }
-
         public static Bitmap RotateImage(Image image, float angle)
         {
             if (image == null)
@@ -314,5 +252,87 @@ namespace ImagesAppTest
 
             return rotatedBmp;
         }
+
+
+        //This only works for threshold-filtered bitmaps
+        public static int FindRotation(Bitmap image)
+        {
+
+            float[] sins = new float[180] { (float)0.0, (float)0.017452, (float)0.034899, (float)0.052336, (float)0.069756, (float)0.087156, (float)0.104528, (float)0.121869, (float)0.139173, (float)0.156434, (float)0.173648, (float)0.190809, (float)0.207912, (float)0.224951, (float)0.241922, (float)0.258819, (float)0.275637, (float)0.292372, (float)0.309017, (float)0.325568, (float)0.342020, (float)0.358368, (float)0.374607, (float)0.390731, (float)0.406737, (float)0.422618, (float)0.438371, (float)0.453990, (float)0.469472, (float)0.484810, (float)0.500000, (float)0.515038, (float)0.529919, (float)0.544639, (float)0.559193, (float)0.573576, (float)0.587785, (float)0.601815, (float)0.615662, (float)0.629320, (float)0.642788, (float)0.656059, (float)0.669131, (float)0.681998, (float)0.694658, (float)0.707107, (float)0.719340, (float)0.731354, (float)0.743145, (float)0.754710, (float)0.766044, (float)0.777146, (float)0.788011, (float)0.798636, (float)0.809017, (float)0.819152, (float)0.829038, (float)0.838671, (float)0.848048, (float)0.857167, (float)0.866025, (float)0.874620, (float)0.882948, (float)0.891007, (float)0.898794, (float)0.906308, (float)0.913545, (float)0.920505, (float)0.927184, (float)0.933580, (float)0.939693, (float)0.945519, (float)0.951057, (float)0.956305, (float)0.961262, (float)0.965926, (float)0.970296, (float)0.974370, (float)0.978148, (float)0.981627, (float)0.984808, (float)0.987688, (float)0.990268, (float)0.992546, (float)0.994522, (float)0.996195, (float)0.997564, (float)0.998630, (float)0.999391, (float)0.999848, (float)1.0, (float)0.999848, (float)0.999391, (float)0.998630, (float)0.997564, (float)0.996195, (float)0.994522, (float)0.992546, (float)0.990268, (float)0.987688, (float)0.984808, (float)0.981627, (float)0.978148, (float)0.974370, (float)0.970296, (float)0.965926, (float)0.961262, (float)0.956305, (float)0.951057, (float)0.945519, (float)0.939693, (float)0.933580, (float)0.927184, (float)0.920505, (float)0.913545, (float)0.906308, (float)0.898794, (float)0.891007, (float)0.882948, (float)0.874620, (float)0.866025, (float)0.857167, (float)0.848048, (float)0.838671, (float)0.829038, (float)0.819152, (float)0.809017, (float)0.798635, (float)0.788011, (float)0.777146, (float)0.766044, (float)0.754710, (float)0.743145, (float)0.731354, (float)0.719340, (float)0.707107, (float)0.694658, (float)0.681998, (float)0.669131, (float)0.656059, (float)0.642788, (float)0.629321, (float)0.615661, (float)0.601815, (float)0.587785, (float)0.573576, (float)0.559193, (float)0.544639, (float)0.529919, (float)0.515038, (float)0.500000, (float)0.484810, (float)0.469472, (float)0.453991, (float)0.438371, (float)0.422618, (float)0.406737, (float)0.390731, (float)0.374607, (float)0.358368, (float)0.342020, (float)0.325568, (float)0.309017, (float)0.292372, (float)0.275637, (float)0.258819, (float)0.241922, (float)0.224951, (float)0.207912, (float)0.190809, (float)0.173648, (float)0.156434, (float)0.139173, (float)0.121869, (float)0.104528, (float)0.087156, (float)0.069756, (float)0.052336, (float)0.034899, (float)0.017452 };
+            float[] coss = new float[180] { (float)1.0, (float)0.999848, (float)0.999391, (float)0.998630, (float)0.997564, (float)0.996195, (float)0.994522, (float)0.992546, (float)0.990268, (float)0.987688, (float)0.984808, (float)0.981627, (float)0.978148, (float)0.974370, (float)0.970296, (float)0.965926, (float)0.961262, (float)0.956305, (float)0.951057, (float)0.945519, (float)0.939693, (float)0.933580, (float)0.927184, (float)0.920505, (float)0.913545, (float)0.906308, (float)0.898794, (float)0.891007, (float)0.882948, (float)0.874620, (float)0.866025, (float)0.857167, (float)0.848048, (float)0.838671, (float)0.829038, (float)0.819152, (float)0.809017, (float)0.798636, (float)0.788011, (float)0.777146, (float)0.766044, (float)0.754710, (float)0.743145, (float)0.731354, (float)0.719340, (float)0.707107, (float)0.694658, (float)0.681998, (float)0.669131, (float)0.656059, (float)0.642788, (float)0.629320, (float)0.615662, (float)0.601815, (float)0.587785, (float)0.573576, (float)0.559193, (float)0.544639, (float)0.529919, (float)0.515038, (float)0.500000, (float)0.484810, (float)0.469472, (float)0.453991, (float)0.438371, (float)0.422618, (float)0.406737, (float)0.390731, (float)0.374607, (float)0.358368, (float)0.342020, (float)0.325568, (float)0.309017, (float)0.292372, (float)0.275637, (float)0.258819, (float)0.241922, (float)0.224951, (float)0.207912, (float)0.190809, (float)0.173648, (float)0.156434, (float)0.139173, (float)0.121869, (float)0.104528, (float)0.087156, (float)0.069757, (float)0.052336, (float)0.034899, (float)0.017452, (float)0.0, (float)-0.017452, (float)-0.034899, (float)-0.052336, (float)-0.069756, (float)-0.087156, (float)-0.104529, (float)-0.121869, (float)-0.139173, (float)-0.156434, (float)-0.173648, (float)-0.190809, (float)-0.207912, (float)-0.224951, (float)-0.241922, (float)-0.258819, (float)-0.275637, (float)-0.292372, (float)-0.309017, (float)-0.325568, (float)-0.342020, (float)-0.358368, (float)-0.374607, (float)-0.390731, (float)-0.406737, (float)-0.422618, (float)-0.438371, (float)-0.453990, (float)-0.469472, (float)-0.484810, (float)-0.500000, (float)-0.515038, (float)-0.529919, (float)-0.544639, (float)-0.559193, (float)-0.573576, (float)-0.587785, (float)-0.601815, (float)-0.615661, (float)-0.629320, (float)-0.642788, (float)-0.656059, (float)-0.669131, (float)-0.681998, (float)-0.694658, (float)-0.707107, (float)-0.719340, (float)-0.731354, (float)-0.743145, (float)-0.754710, (float)-0.766044, (float)-0.777146, (float)-0.788011, (float)-0.798635, (float)-0.809017, (float)-0.819152, (float)-0.829037, (float)-0.838671, (float)-0.848048, (float)-0.857167, (float)-0.866025, (float)-0.874620, (float)-0.882948, (float)-0.891006, (float)-0.898794, (float)-0.906308, (float)-0.913545, (float)-0.920505, (float)-0.927184, (float)-0.933580, (float)-0.939693, (float)-0.945519, (float)-0.951056, (float)-0.956305, (float)-0.961262, (float)-0.965926, (float)-0.970296, (float)-0.974370, (float)-0.978148, (float)-0.981627, (float)-0.984808, (float)-0.987688, (float)-0.990268, (float)-0.992546, (float)-0.994522, (float)-0.996195, (float)-0.997564, (float)-0.998630, (float)-0.999391, (float)-0.999848 };
+
+            BitmapData bm = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
+                            System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            byte[,] bwImage = new byte[image.Width, image.Height];
+            int stride = bm.Stride;
+            System.IntPtr scan0 = bm.Scan0;
+
+            //copy to a 2d array
+            unsafe
+            {
+                byte* p = (byte*)(void*)scan0;
+                int offset = stride - image.Width * 3;
+
+                for (int y = 0; y < image.Height; y++)
+                {
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        bwImage[x, y] = p[0];
+                        //if (bwImage[x, y] != 255) MessageBox.Show(x + "," + y);
+                        p += 3; //Advance by 3b
+                    }
+                    p += offset;
+                }
+            }
+            image.UnlockBits(bm);
+
+            //Hough transform
+            int distance = (int)((image.Width+ image.Height)*Math.Sqrt(2));
+            distance = (int)Math.Sqrt(image.Width * image.Width + image.Height * image.Height);
+
+            int[,] accumulator = new int[180, distance + 1];
+            for (int x = 0; x < image.Width; x++)
+            {
+                for (int y = 0; y < image.Height; y++)
+                {
+                    if (bwImage[x, y] == 0)
+                    {
+                        for (int i = 0; i < 180; i++)
+                        {
+                            //double rads = i*Math.PI/180.0;
+                            //double d2 = Math.Max(0, y * Math.Sin(rads) + x * Math.Cos(rads));
+                            double d2 = Math.Abs(y * sins[i] + x * coss[i]);
+                            accumulator[i, (int)d2]++;
+                        }
+                    }
+                }
+            }
+
+            int xMax = 0, yMax = 0, nMax = 0;
+            for (int x = 0; x < 180; x++)
+            {
+                //int n=0;
+                for (int y = 0; y < distance; y++)
+                {
+                    if (accumulator[x, y] > nMax)
+                    {
+                        xMax = x;
+                        yMax = y;
+                        nMax = accumulator[x, y];
+                    }
+
+                }
+            }
+
+            for (int x = 0; x < image.Width; x++)
+            {
+                int y2 = (int)(((distance/2 - x) * Math.Cos((xMax) * Math.PI / 180.0)) / Math.Sin((xMax) * Math.PI / 180.0));
+                image.SetPixel(x, Math.Max(0, Math.Min(y2, image.Height - 1)), Color.Red);
+            }
+
+            return xMax;
+        }
+
     }
 }
