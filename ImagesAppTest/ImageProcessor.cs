@@ -16,6 +16,7 @@ namespace ImagesAppTest
                 System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             int[,] intergralImage = new int[image.Width, image.Height];
+            byte[,] grayscaleImage = new byte[image.Width, image.Height];
             int stride = bm.Stride;
             System.IntPtr scan0 = bm.Scan0;
 
@@ -27,11 +28,22 @@ namespace ImagesAppTest
                 byte* p = (byte*)(void*)scan0;
                 int offset = stride - image.Width * 3;
 
+                //get grayscaleImage
+                for (int y = 0; y < image.Height; y++)
+                {
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        grayscaleImage[x,y] = (byte)(((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255);
+                        p += 3;
+                    }
+                    p += offset;
+                }
+
                 //get the intergralImage
 
                 for (int x = 0; x < image.Width; x++)
                 {
-                    intergralImage[x, 0] += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
+                    intergralImage[x, 0] += grayscaleImage[x,0];
                     p += 3;
                 }
 
@@ -42,8 +54,7 @@ namespace ImagesAppTest
                 {
                     for (int x = 0; x < image.Width; x++)
                     {
-                        //currentX += (p[0] + p[1] + p[2]) / 3;
-                        currentX += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
+                        currentX += grayscaleImage[x,y];
                         intergralImage[x, y] = currentX + intergralImage[x, y - 1];
                         p+=3; //Advance by 1b
                     }
@@ -69,7 +80,7 @@ namespace ImagesAppTest
                                         - intergralImage[x2, y1] + intergralImage[x1, y1])) / div;
 
                         //if (((p[0]+p[1]+p[2])/3) >= threshold)
-                        if ((((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255) >= threshold)
+                        if (grayscaleImage[x,y] >= threshold)
                         {
                             p[0] = 255;
                             p[1] = 255;
