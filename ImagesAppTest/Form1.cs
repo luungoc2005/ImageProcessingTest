@@ -59,13 +59,19 @@ namespace ImagesAppTest
 
         private void button2_Click(object sender, EventArgs e)
         {
+            long first = DateTime.Now.Ticks;
+
             var bmp = new Bitmap(pictureBox1.Image);
             ImageProcessor.AdaptiveThreshold(bmp);
-            int angle = ImageProcessor.FindRotation(bmp);
+            //int angle = ImageProcessor.FindRotation(bmp);
             //MessageBox.Show(angle.ToString());
 
-            //pictureBox1.Image = bmp;
-            pictureBox1.Image = ImageProcessor.RotateImage(bmp, 90 - angle);
+            pictureBox1.Image = bmp;
+            //pictureBox1.Image = ImageProcessor.RotateImage(bmp, 90 - angle);
+
+            long last = DateTime.Now.Ticks;
+
+            this.Text = ((last - first) / TimeSpan.TicksPerMillisecond).ToString() + " ms";
 
         }
     }
