@@ -16,7 +16,7 @@ namespace ImagesAppTest
                 System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             int[,] intergralImage = new int[image.Width, image.Height];
-            byte[,] grayscaleImage = new byte[image.Width, image.Height];
+            int[,] grayscaleImage = new int[image.Width, image.Height];
             int stride = bm.Stride;
             System.IntPtr scan0 = bm.Scan0;
 
@@ -33,7 +33,7 @@ namespace ImagesAppTest
                 {
                     for (int x = 0; x < image.Width; x++)
                     {
-                        grayscaleImage[x,y] = (byte)(((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255);
+                        grayscaleImage[x,y] = (((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255);
                         p += 3;
                     }
                     p += offset;
@@ -41,24 +41,32 @@ namespace ImagesAppTest
 
                 //get the intergralImage
 
-                for (int x = 0; x < image.Width; x++)
-                {
-                    intergralImage[x, 0] += grayscaleImage[x,0];
-                }
+                intergralImage[0, 0] = grayscaleImage[0, 0];
 
-                p += image.Width * 3 + offset;
-                int currentX = 0;
+                for (int x = 1; x < image.Width; x++)
+                {
+                    intergralImage[x, 0] = intergralImage[x-1, 0] + grayscaleImage[x,0];
+                }
 
                 for (int y = 1; y < image.Height; y++)
                 {
-                    for (int x = 0; x < image.Width; x++)
+                    intergralImage[0, y] = grayscaleImage[0, y - 1] + grayscaleImage[0, y];
+                }
+
+                p += image.Width * 3 + offset;
+                //int currentX = 0;
+
+                for (int y = 1; y < image.Height; y++)
+                {
+                    for (int x = 1; x < image.Width; x++)
                     {
-                        currentX += grayscaleImage[x,y];
-                        intergralImage[x, y] = currentX + intergralImage[x, y - 1];
+                        //currentX += grayscaleImage[x,y];
+                        intergralImage[x, y] = intergralImage[x-1, y]+intergralImage[x, y - 1]
+                            +grayscaleImage[x,y]-intergralImage[x-1,y-1];
                         p+=3; //Advance by 1b
                     }
 
-                    currentX = 0;
+                    //currentX = 0;
                     p += offset;
                 }
 
@@ -75,8 +83,8 @@ namespace ImagesAppTest
                         int x2 = Math.Min(bm.Width - 1, x + res);
                         int y2 = Math.Min(bm.Height - 1, y + res);
 
-                        int threshold = ((intergralImage[x2, y2] - intergralImage[x1, y2]
-                                        - intergralImage[x2, y1] + intergralImage[x1, y1])) / div;
+                        int threshold = (((intergralImage[x2, y2] - intergralImage[x1, y2]
+                                        - intergralImage[x2, y1] + intergralImage[x1, y1])) / div);
 
                         //if (((p[0]+p[1]+p[2])/3) >= threshold)
                         if (grayscaleImage[x,y] >= threshold)
