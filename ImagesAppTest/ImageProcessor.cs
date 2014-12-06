@@ -37,13 +37,14 @@ namespace ImagesAppTest
                     p += 3;
                 }
                 p += offset;
+                currentX = 0;
 
                 for (int y = 1; y < image.Height; y++)
                 {
                     for (int x = 0; x < image.Width; x++)
                     {
-                        currentX += (p[0] + p[1] + p[2]) / 3;
-                        //currentX += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
+                        //currentX += (p[0] + p[1] + p[2]) / 3;
+                        currentX += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
                         intergralImage[x, y] = currentX + intergralImage[x, y - 1];
                         p+=3; //Advance by 1b
                     }
@@ -68,7 +69,8 @@ namespace ImagesAppTest
                         int threshold = ((intergralImage[x2, y2] - intergralImage[x1, y2]
                                         -intergralImage[x2,y1]+intergralImage[x1,y1])) / div;
 
-                        if (((p[0]+p[1]+p[2])/3) >= threshold)
+                        //if (((p[0]+p[1]+p[2])/3) >= threshold)
+                        if ((((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255) >= threshold)
                         {
                             p[0] = 255;
                             p[1] = 255;

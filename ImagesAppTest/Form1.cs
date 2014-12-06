@@ -65,7 +65,7 @@ namespace ImagesAppTest
             //MessageBox.Show(angle.ToString());
 
             //pictureBox1.Image = bmp;
-            pictureBox1.Image = ImageProcessor.RotateImage(bmp, 90-angle);
+            pictureBox1.Image = ImageProcessor.RotateImage(bmp, 90 - angle);
 
         }
     }
