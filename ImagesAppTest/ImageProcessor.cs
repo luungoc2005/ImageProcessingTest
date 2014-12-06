@@ -28,16 +28,15 @@ namespace ImagesAppTest
                 int offset = stride - image.Width * 3;
 
                 //get the intergralImage
-                int currentX=0;
 
                 for (int x = 0; x < image.Width; x++)
                 {
-                    currentX += (p[0] + p[1] + p[2]) / 3;
-                    intergralImage[x, 0] = currentX;
+                    intergralImage[x, 0] += (p[0] + p[1] + p[2]) / 3;
                     p += 3;
                 }
+
                 p += offset;
-                currentX = 0;
+                int currentX = 0;
 
                 for (int y = 1; y < image.Height; y++)
                 {
@@ -58,16 +57,16 @@ namespace ImagesAppTest
                 p = (byte*)(void*)scan0;
 
                 for (int y = 0; y < image.Height; y++)
-                {                    
+                {
                     for (int x = 0; x < image.Width; x++)
                     {
                         int x1 = Math.Max(0, x - res);
                         int y1 = Math.Max(0, y - res);
-                        int x2 = Math.Min(bm.Width-1, x + res);
-                        int y2 = Math.Min(bm.Height-1, y + res);
+                        int x2 = Math.Min(bm.Width - 1, x + res);
+                        int y2 = Math.Min(bm.Height - 1, y + res);
 
                         int threshold = ((intergralImage[x2, y2] - intergralImage[x1, y2]
-                                        -intergralImage[x2,y1]+intergralImage[x1,y1])) / div;
+                                        - intergralImage[x2, y1] + intergralImage[x1, y1])) / div;
 
                         //if (((p[0]+p[1]+p[2])/3) >= threshold)
                         if ((((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255) >= threshold)
@@ -82,7 +81,7 @@ namespace ImagesAppTest
                             p[1] = 0;
                             p[2] = 0;
                         }
-                        p+=3; //Advance by 3b
+                        p += 3; //Advance by 3b
                     }
                     p += offset;
                 }
