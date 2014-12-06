@@ -31,7 +31,7 @@ namespace ImagesAppTest
 
                 for (int x = 0; x < image.Width; x++)
                 {
-                    intergralImage[x, 0] += (p[0] + p[1] + p[2]) / 3;
+                    intergralImage[x, 0] += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
                     p += 3;
                 }
 
