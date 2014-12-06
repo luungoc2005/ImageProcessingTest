@@ -31,24 +31,30 @@ namespace ImagesAppTest
 
                 for (int x = 0; x < image.Width; x++)
                 {
-                    intergralImage[x, 0] += (p[0] + p[1] + p[2]) / 3;
+                    intergralImage[x, 0] += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
                     p += 3;
                 }
 
                 p += offset;
-                int currentX = 0;
 
                 for (int y = 1; y < image.Height; y++)
                 {
-                    for (int x = 0; x < image.Width; x++)
+                    intergralImage[0, y] += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
+                    p += image.Width * 3+offset;
+                }
+
+                p = (byte*)(void*)scan0 + image.Width *3 + offset;
+
+                for (int y = 1; y < image.Height; y++)
+                {
+                    p += 3;
+                    for (int x = 1; x < image.Width; x++)
                     {
-                        //currentX += (p[0] + p[1] + p[2]) / 3;
-                        currentX += ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255;
-                        intergralImage[x, y] = currentX + intergralImage[x, y - 1];
+                        intergralImage[x, y] = intergralImage[x - 1, y] - intergralImage[x - 1, y- 1] +
+                            ((p[0] * 28 + p[1] * 77 + p[2] * 150) >> 8) & 255 + intergralImage[x, y - 1];
                         p+=3; //Advance by 1b
                     }
 
-                    currentX = 0;
                     p += offset;
                 }
 
