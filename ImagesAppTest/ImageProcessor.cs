@@ -44,10 +44,9 @@ namespace ImagesAppTest
                 for (int x = 0; x < image.Width; x++)
                 {
                     intergralImage[x, 0] += grayscaleImage[x,0];
-                    p += 3;
                 }
 
-                p += offset;
+                p += image.Width * 3 + offset;
                 int currentX = 0;
 
                 for (int y = 1; y < image.Height; y++)
@@ -310,11 +309,11 @@ namespace ImagesAppTest
             {
                 for (int y = 0; y < image.Height; y++)
                 {
+                    double y1 = y;
                     if (bwImage[x, y] == 0)
                     {
                         //to avoid repeated type casting
                         double x1 = x;
-                        double y1 = y;
                         for (int i = 60; i < 120; i++)
                         {
                             //double rads = i*Math.PI/180.0;
